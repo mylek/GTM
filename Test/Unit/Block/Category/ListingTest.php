@@ -66,7 +66,6 @@ class ListingTest extends TestCase
         foreach ($params['products'] as $product) {
             $products[] = $this->getProduct($product['name'], $product['sku'], $product['price']);
         }
-
         $this->object->method('getProducts')->willReturn($products);
 
         $category = $this->getMockBuilder(Category::class)
@@ -82,12 +81,10 @@ class ListingTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $currency->method('getCode')->willReturn($params['currency']);
-
         $store->method('getCurrentCurrency')->willReturn($currency);
         $this->storeManager->method('getStore')->willReturn($store);
 
         $data = $this->object->getProductsData();
-        $this->assertEquals($expected['ecommerce'], $data['ecommerce']);
         $this->assertEquals($expected, $data);
     }
 
