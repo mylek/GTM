@@ -7,7 +7,6 @@ namespace MylSoft\GTM\ViewModel;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use MylSoft\GTM\Helper\Config;
 
-
 class InitGTM implements ArgumentInterface
 {
     public function __construct(

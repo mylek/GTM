@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MylSoft\GTM\Block\Category;
+
+use Magento\Framework\Registry;
+use Magento\Framework\View\Element\Template;
+use Magento\Eav\Model\Entity\Collection\AbstractCollection;
+use MylSoft\GTM\Model\Service\Catalog;
+use Magento\Store\Model\StoreManagerInterface;
+
+class Listing extends Template
+{
+    public function __construct(
+        Template\Context $context,
+        protected Registry $registry,
+        protected StoreManagerInterface $storeManager,
+        array $data = [])
+    {
+        parent::__construct($context, $data);
+    }
+
+    public function getProducts(): array {
+        return $this->getLayout()->getBlock('category.products.list')->getLoadedProductCollection()->getItems();
+    }
+
+    public function getProductsData(): array {
+        $products = $this->getProducts();
+        $category = $this->registry->registry('current_category');
+        $currency = $this->storeManager->getStore()->getCurrentCurrency();
+
+        $catalog = new Catalog($products, $category, $currency);
+        return $catalog->getData();
+    }
+}

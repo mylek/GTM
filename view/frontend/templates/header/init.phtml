@@ -13,4 +13,5 @@ $vieModel = $block->getViewModel();
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
         })(window,document,'script','dataLayer','<?= $vieModel->getCode() ?>');</script>
     <!-- End Google Tag Manager -->
+    <script>dataLayer.push({ ecommerce: null });</script>
 <?php endif; ?>
