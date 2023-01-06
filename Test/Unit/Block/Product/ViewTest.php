@@ -75,7 +75,7 @@ class ViewTest extends TestCase
                                 'list' => 'Category 1',
                             ],
                             'products' => [
-                                ['name' => 'Product 1', 'id' => 'sku1', 'price' => 11, 'category' => 'Category 1'],
+                                ['name' => 'Product 1', 'id' => 'sku1', 'price' => 11.0, 'category' => 'Category 1'],
                             ],
                         ],
                     ],

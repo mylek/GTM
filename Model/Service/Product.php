@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace MylSoft\GTM\Model\Service;
 
-use Magento\Catalog\Model\Product as ProducModel;
-
 class Product extends GTM
 {
 
     /**
      * @return array
      */
-    public function getData(ProducModel $product): array
+    public function getData(): array
     {
         return [
             'ecommerce' => [
@@ -20,7 +18,7 @@ class Product extends GTM
                     'actionField' => [
                         'list' => $this->category->getName()
                     ],
-                    'products' => [$this->getProducts()]
+                    'products' => $this->getProducts(false)
                 ]
             ]
         ];

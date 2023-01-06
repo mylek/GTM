@@ -24,14 +24,14 @@ abstract class GTM
     /**
      * @return array
      */
-    protected function getProducts(): array
+    protected function getProducts(bool $position = true): array
     {
         $products = [];
 
         $i = 1;
         foreach ($this->products as $product) {
             $productGTM = new ProductGTM($product, $this->category->getName());
-            $products[] = $productGTM->getProduct($i++);
+            $products[] = $productGTM->getProduct($position ? $i++ : null);
         }
 
         return $products;

@@ -14,7 +14,7 @@ class Checkout extends GTM
             'ecommerce' => [
                 'checkout' => [
                     'actionField' => ['step' => 1],
-                    'products' => [$this->getProducts()]
+                    'products' => $this->getProducts()
                 ]
             ]
         ];
@@ -23,7 +23,7 @@ class Checkout extends GTM
     /**
      * @return array
      */
-    protected function getProducts(): array
+    protected function getProducts(bool $position = true): array
     {
         $items = [];
         foreach ($this->products as $product) {

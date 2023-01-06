@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace MylSoft\GTM\Model\GTM;
 
-use Magento\Catalog\Model\Product as ProducModel;
+use Magento\Quote\Model\Quote\Item as ItemQuote;
 
-class Product
+class Item
 {
     public function __construct(
-        protected ProducModel $product,
-        protected string $categoryName
+        private ItemQuote $product
     )
     {
     }
@@ -24,13 +23,12 @@ class Product
         $data = [
             'name' => $this->product->getName(),
             'id' => $this->product->getSku(),
-            'price' => $this->product->getFinalPrice(),
-            'category' => $this->categoryName
+            'price' => $this->product->getPrice(),
+            'quantity' => $this->product->getQty()
         ];
 
         if ($i !== null) {
             $data['position'] = $i;
-            $data['list'] = $this->categoryName;
         }
 
         return $data;

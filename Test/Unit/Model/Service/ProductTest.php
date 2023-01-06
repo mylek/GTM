@@ -33,8 +33,9 @@ class ProductTest extends TestCase
         $this->object->setCategory($category);
 
         $product = $this->getProduct($params['product']['name'], $params['product']['sku'], $params['product']['price']);
+        $this->object->setProducts([$product]);
 
-        $this->assertEquals($expected, $this->object->getData($product));
+        $this->assertEquals($expected, $this->object->getData());
     }
 
     private function getDataProvider(): array
