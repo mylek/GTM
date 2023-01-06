@@ -45,11 +45,13 @@ class ListingTest extends TestCase
             ['getStore']
         );
         $this->object = $this->getMockBuilder(Listing::class)
-            ->setConstructorArgs([
-                                     'context' => $this->context,
-                                     'registry' => $this->registry,
-                                     'storeManager' => $this->storeManager,
-                                 ])
+            ->setConstructorArgs(
+                [
+                    'context' => $this->context,
+                    'registry' => $this->registry,
+                    'storeManager' => $this->storeManager,
+                ]
+            )
             ->onlyMethods(['getProducts'])
             ->getMock();
     }

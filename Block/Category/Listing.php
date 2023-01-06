@@ -21,7 +21,7 @@ class Listing extends Template
         parent::__construct($context, $data);
     }
 
-    public function getProducts(): array {
+    protected function getProducts(): array {
         return $this->getLayout()->getBlock('category.products.list')->getLoadedProductCollection()->getItems();
     }
 
@@ -30,7 +30,8 @@ class Listing extends Template
         $category = $this->registry->registry('current_category');
         $currency = $this->storeManager->getStore()->getCurrentCurrency();
 
-        $catalog = new Catalog($products, $category, $currency);
+        $catalog = new Catalog($category, $currency);
+        $catalog->setProducts($products);
         return $catalog->getData();
     }
 }

@@ -14,5 +14,12 @@
                 </arguments>
             </block>
         </referenceBlock>
+        <referenceContainer name="after.body.start">
+            <block class="Magento\Framework\View\Element\Template" before="-" name="gtm.init.body" template="MylSoft_GTM::block/init.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">MylSoft\GTM\ViewModel\InitGTM</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
     </body>
 </page>

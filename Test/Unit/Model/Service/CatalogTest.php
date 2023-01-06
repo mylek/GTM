@@ -15,16 +15,12 @@ class CatalogTest extends TestCase
 {
     private Catalog $object;
 
-    private array $collection;
-
     private MockObject $category;
 
     private MockObject $currency;
 
     protected function setUp(): void
     {
-        $this->collection = [];
-
         $this->category = $this->getMockBuilder(Category::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -34,7 +30,6 @@ class CatalogTest extends TestCase
             ->getMock();
 
         $this->object = new Catalog(
-            $this->collection,
             $this->category,
             $this->currency
         );
@@ -50,20 +45,21 @@ class CatalogTest extends TestCase
      */
     public function testGetData(array $expected, string $currency, string $categoryName, array $products): void
     {
+        $mockProducts = [];
         foreach ($products as $product) {
-            $this->collection[] = $this->getProduct($product['name'], $product['sku'], $product['price']);
+            $mockProducts[] = $this->getProduct($product['name'], $product['sku'], $product['price']);
         }
 
         $this->currency->method('getCode')->willReturn($currency);
         $this->category->method('getName')->willReturn($categoryName);
 
         $this->object = new Catalog(
-            $this->collection,
             $this->category,
             $this->currency
         );
-
+        $this->object->setProducts($mockProducts);
         $data = $this->object->getData();
+
         $this->assertEquals($expected['ecommerce'], $data['ecommerce']);
         $this->assertEquals($expected, $data);
     }
