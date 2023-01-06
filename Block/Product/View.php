@@ -28,8 +28,9 @@ class View extends Template
         $gtmProduct = new Product();
         $category = $this->registry->registry('current_category');
         $gtmProduct->setCategory($category);
+        $gtmProduct->setProducts($product);
 
-        return $gtmProduct->getData($product);
+        return $gtmProduct->getData();
     }
 
     protected function getCurrentProduct()

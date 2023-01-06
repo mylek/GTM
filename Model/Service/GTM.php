@@ -58,4 +58,20 @@ abstract class GTM
 
         return $data;
     }
+
+    /**
+     * @param array $product
+     * @param int $i
+     * @return array
+     */
+    public function getItem(array $item, ?int $i = null): array {
+        $data = [
+            'name' => $item->getName(),
+            'id' => $item->getSku(),
+            'price' => $item->getFinalPrice(),
+            //'category' => $this->category->getName(),
+            'quantity' => ''
+        ];
+        return $data;
+    }
 }

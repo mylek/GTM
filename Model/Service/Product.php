@@ -20,7 +20,7 @@ class Product extends GTM
                     'actionField' => [
                         'list' => $this->category->getName()
                     ],
-                    'products' => [$this->getProduct($product)]
+                    'products' => [$this->getProducts()]
                 ]
             ]
         ];

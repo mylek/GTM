@@ -16,19 +16,16 @@ class Product
     }
 
     /**
-     * @param ProducModel $product
-     * @param int $i
+     * @param int|null $i
      * @return array
      */
-    public function getProduct(int $i = null): array
+    public function getProduct(?int $i = null): array
     {
         $data = [
             'name' => $this->product->getName(),
             'id' => $this->product->getSku(),
             'price' => $this->product->getFinalPrice(),
-            //'brand' => 'Google',
             'category' => $this->categoryName,
-            //'variant' => 'Gray',
             'list' => $this->categoryName
         ];
 
