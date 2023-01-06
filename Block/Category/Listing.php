@@ -6,7 +6,6 @@ namespace MylSoft\GTM\Block\Category;
 
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
-use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use MylSoft\GTM\Model\Service\Catalog;
 use Magento\Store\Model\StoreManagerInterface;
 
