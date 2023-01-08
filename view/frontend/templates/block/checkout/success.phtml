@@ -1,0 +1,10 @@
+<?php
+/**
+ * @var $block \MylSoft\GTM\Block\Checkout\Onepage\Success
+ */
+?>
+
+<script>
+    dataLayer.push({ ecommerce: null });
+    dataLayer.push(<?= json_encode($block->getData()) ?>);
+</script>

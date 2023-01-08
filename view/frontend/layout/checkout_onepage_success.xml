@@ -10,17 +10,8 @@
         <title>Success Page</title>
     </head>
     <body>
-        <referenceBlock name="page.main.title">
-            <block class="Magento\Checkout\Block\Onepage\Success" name="checkout.success.print.button" template="Magento_Checkout::button.phtml"/>
-            <action method="setPageTitle">
-                <argument translate="true" name="title" xsi:type="string">Thank you for your purchase!</argument>
-            </action>
-        </referenceBlock>
-        <referenceContainer name="content">
-            <block class="Magento\Checkout\Block\Onepage\Success" name="checkout.success" template="Magento_Checkout::success.phtml" cacheable="false">
-                <container name="order.success.additional.info" label="Order Success Additional Info"/>
-            </block>
-            <block class="Magento\Checkout\Block\Registration" name="checkout.registration" template="Magento_Checkout::registration.phtml" cacheable="false"/>
+        <referenceContainer name="after.body.start">
+            <block class="MylSoft\GTM\Block\Checkout\Onepage\Success" name="gtm_product_checkout_success" after="-" template="MylSoft_GTM::block/checkout/success.phtml" />
         </referenceContainer>
     </body>
 </page>

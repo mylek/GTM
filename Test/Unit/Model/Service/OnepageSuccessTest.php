@@ -53,6 +53,7 @@ class OnepageSuccessTest extends TestCase
         }
 
         $this->object->setProducts($products);
+        $this->object->setOrder($order);
         $this->assertEquals($expected, $this->object->getData());
     }
 

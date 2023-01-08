@@ -4,31 +4,23 @@ declare(strict_types=1);
 
 namespace MylSoft\GTM\Model\Service;
 
-use Magento\Checkout\Model\Session;
 use Magento\Sales\Model\Order;
 use MylSoft\GTM\Model\GTM\Item;
 
 class OnepageSuccess extends GTM
 {
-    public function __construct(
-        private Session $checkoutSession,
-        private Order $orderItemsDetails
-    )
-    {
-    }
+    protected Order $order;
 
     /**
      * @return array
      */
     public function getData(): array
     {
-        $incrementId  = $this->checkoutSession->getLastRealOrder()->getIncrementId();
-        $order = $this->orderItemsDetails->loadByIncrementId($incrementId);
-
+        var_dump($this->getProducts());
         return [
             'ecommerce' => [
                 'purchase' => [
-                    'actionField' => $this->getActionField($incrementId, $order),
+                    'actionField' => $this->getActionField(),
                     'products' => $this->getProducts(),
                 ],
             ],
@@ -49,16 +41,20 @@ class OnepageSuccess extends GTM
         return $items;
     }
 
+    public function setOrder(Order $order): void {
+        $this->order = $order;
+    }
 
-    private function getActionField(string $incrementId, Order $order): array
+
+    private function getActionField(): array
     {
         return [
-            'id' => $incrementId,
+            'id' => $this->order->getIncrementId(),
             'affiliation' => 'Online Store',
-            'revenue' => $order->getBaseSubtotal(),
-            'tax' => $order->getTaxAmount(),
-            'shipping' => $order->getBaseShippingAmount(),
-            'coupon' => $order->getCouponCode(),
+            'revenue' => $this->order->getBaseSubtotal(),
+            'tax' => $this->order->getTaxAmount(),
+            'shipping' => $this->order->getBaseShippingAmount(),
+            'coupon' => $this->order->getCouponCode(),
         ];
     }
 }
