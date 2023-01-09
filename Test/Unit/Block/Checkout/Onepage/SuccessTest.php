@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use MylSoft\GTM\Block\Checkout\Onepage\Success;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Checkout\Model\Session;
-use Magento\Quote\Model\Quote;
+use Magento\Sales\Model\Order\Item as ItemOrder;
 use MylSoft\GTM\Model\Service\OnepageSuccess;
 use Magento\Sales\Model\Order;
 
@@ -62,12 +62,6 @@ class SuccessTest extends TestCase
             );
         }
 
-        $quote = $this->getMockBuilder(Quote::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $quote->method('getItems')->willReturn($items);
-        $this->session->method('getQuote')->willReturn($quote);
-
         $order = $this->getMockBuilder(Order::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -76,6 +70,7 @@ class SuccessTest extends TestCase
         $order->method('getTaxAmount')->willReturn($params['taxAmount']);
         $order->method('getBaseShippingAmount')->willReturn($params['baseShippingAmount']);
         $order->method('getCouponCode')->willReturn($params['couponCode']);
+        $order->method('getAllVisibleItems')->willReturn($items);
         $this->order->method('loadByIncrementId')->willReturn($order);
         $this->session->method('getLastRealOrder')->willReturn($order);
 
@@ -89,25 +84,27 @@ class SuccessTest extends TestCase
                 [
                     'ecommerce' => [
                         'purchase' => [
-                            'id' => 'T12345',
-                            'affiliation' => 'Online Store',
-                            'revenue' => '35.43',
-                            'tax' => '4.90',
-                            'shipping' => '5.99',
-                            'coupon' => 'SUMMER_SALE',
-                        ],
-                        'products' => [
-                            [
-                                'name' => 'Triblend Android T-Shirt',
-                                'id' => '12345',
-                                'price' => 15.25,
-                                'quantity' => 1,
+                            'actionField' => [
+                                'id' => 'T12345',
+                                'affiliation' => 'Online Store',
+                                'revenue' => '35.43',
+                                'tax' => '4.90',
+                                'shipping' => '5.99',
+                                'coupon' => 'SUMMER_SALE',
                             ],
-                            [
-                                'name' => 'Donut Friday Scented T-Shirt',
-                                'id' => '67890',
-                                'price' => '33.75',
-                                'quantity' => 1,
+                            'products' => [
+                                [
+                                    'name' => 'Triblend Android T-Shirt',
+                                    'id' => '12345',
+                                    'price' => 15.25,
+                                    'quantity' => 1,
+                                ],
+                                [
+                                    'name' => 'Donut Friday Scented T-Shirt',
+                                    'id' => '67890',
+                                    'price' => '33.75',
+                                    'quantity' => 1,
+                                ],
                             ],
                         ],
                     ],
@@ -119,7 +116,7 @@ class SuccessTest extends TestCase
                     'baseShippingAmount' => 5.99,
                     'couponCode' => 'SUMMER_SALE',
                     'products' => [
-                        ['name' => 'Triblend Android T-Shirt111', 'sku' => '12345', 'price' => 15.25, 'qty' => 1],
+                        ['name' => 'Triblend Android T-Shirt', 'sku' => '12345', 'price' => 15.25, 'qty' => 1],
                         ['name' => 'Donut Friday Scented T-Shirt', 'sku' => '67890', 'price' => 33.75, 'qty' => 1],
                     ],
                 ],
@@ -131,17 +128,17 @@ class SuccessTest extends TestCase
      * @param string $name
      * @param string $sku
      * @param float $price
-     * @return Item
+     * @return ItemOrder
      */
-    private function getItem(string $name, string $sku, float $price, int $qty): Item
+    private function getItem(string $name, string $sku, float $price, int $qty): ItemOrder
     {
-        $item = $this->getMockBuilder(Item::class)
+        $item = $this->getMockBuilder(ItemOrder::class)
             ->disableOriginalConstructor()
             ->getMock();
         $item->method('getName')->willReturn($name);
         $item->method('getSku')->willReturn($sku);
         $item->method('getPrice')->willReturn($price);
-        $item->method('getQty')->willReturn($qty);
+        $item->method('getQtyOrdered')->willReturn($qty);
 
         return $item;
     }

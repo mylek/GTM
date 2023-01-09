@@ -16,12 +16,11 @@ class OnepageSuccess extends GTM
      */
     public function getData(): array
     {
-        var_dump($this->getProducts());
         return [
             'ecommerce' => [
                 'purchase' => [
                     'actionField' => $this->getActionField(),
-                    'products' => $this->getProducts(),
+                    'products' => $this->getProducts()
                 ],
             ],
         ];

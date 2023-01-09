@@ -24,8 +24,10 @@ class Success extends Template
 
     public function getSuccess(): array
     {
-        $this->onepageSuccess->setProducts($this->getProducts());
-        $this->onepageSuccess->setOrder($this->getOrder());
+        $this->onepageSuccess = new OnepageSuccess();
+        $order = $this->getOrder();
+        $this->onepageSuccess->setProducts($this->getProducts($order));
+        $this->onepageSuccess->setOrder($order);
 
         return $this->onepageSuccess->getData();
     }
@@ -39,12 +41,12 @@ class Success extends Template
     }
 
     /**
+     * @param Order $order
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    protected function getProducts(): array {
-        $checkoutSession = $this->checkoutSession->getQuote();
-        return $checkoutSession->getItems();
+    protected function getProducts(Order $order): array {
+        return $order->getAllVisibleItems();
     }
 }
