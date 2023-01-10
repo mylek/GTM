@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MylSoft\GTM\Test\Unit\Block\Product;
 
+use Magento\Catalog\Helper\Product\Configuration;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use MylSoft\GTM\Block\Checkout;
@@ -28,11 +29,16 @@ class CheckoutTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->configuration = $this->getMockBuilder(Configuration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->object = $this->getMockBuilder(Checkout::class)
             ->setConstructorArgs(
                 [
                     'context' => $this->context,
                     'checkoutSession' => $this->session,
+                    'configuration' => $this->configuration,
                 ]
             )
             ->onlyMethods(['getProducts'])
@@ -47,7 +53,7 @@ class CheckoutTest extends TestCase
      */
     public function testGetCheckout(array $expected, array $params): void
     {
-        $item = $this->getItem($params['name'], $params['sku'], $params['price'], $params['qty']);
+        $item = $this->getItem($params['name'], $params['sku'], $params['price'], $params['qty'], $params['variants']);
         $products = [$item];
         $this->object->method('getProducts')->willReturn($products);
         $this->assertEquals($expected, $this->object->getCheckout());
@@ -62,12 +68,35 @@ class CheckoutTest extends TestCase
                     'ecommerce' => [
                         'checkout' => [
                             'actionField' => ['step' => 1],
-                            'products' => [['name' => 'Product 5', 'id' => 'sku5', 'price' => 55.11, 'quantity' => 5]],
+                            'products' => [
+                                [
+                                    'name' => 'Product 5',
+                                    'id' => 'sku5',
+                                    'price' => 55.11,
+                                    'quantity' => 5,
+                                    'variant' => 'color: black, size: M',
+                                ],
+                            ],
                         ],
-                    ]
+                    ],
                 ],
-                ['name' => 'Product 5', 'sku' => 'sku5', 'price' => 55.11, 'qty' => 5]
-            ]
+                [
+                    'name' => 'Product 5',
+                    'sku' => 'sku5',
+                    'price' => 55.11,
+                    'qty' => 5,
+                    'variants' => [
+                        [
+                            'label' => 'color',
+                            'value' => 'black',
+                        ],
+                        [
+                            'label' => 'size',
+                            'value' => 'M',
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -77,7 +106,7 @@ class CheckoutTest extends TestCase
      * @param float $price
      * @return Item
      */
-    private function getItem(string $name, string $sku, float $price, int $qty): Item
+    private function getItem(string $name, string $sku, float $price, int $qty, array $variants): Item
     {
         $item = $this->getMockBuilder(Item::class)
             ->disableOriginalConstructor()
@@ -86,6 +115,8 @@ class CheckoutTest extends TestCase
         $item->method('getSku')->willReturn($sku);
         $item->method('getPrice')->willReturn($price);
         $item->method('getQty')->willReturn($qty);
+
+        $this->configuration->method('getOptions')->willReturn($variants);
 
         return $item;
     }
