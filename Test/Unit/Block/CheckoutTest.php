@@ -11,6 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Checkout\Model\Session;
 use Magento\Quote\Model\Quote;
+use Magento\Catalog\Helper\Product\Configuration;
 
 class CheckoutTest extends TestCase
 {
@@ -20,6 +21,8 @@ class CheckoutTest extends TestCase
 
     private MockObject $checkoutSession;
 
+    private MockObject $configuration;
+
     protected function setUp(): void
     {
         $this->context = $this->getMockBuilder(Context::class)
@@ -28,8 +31,11 @@ class CheckoutTest extends TestCase
         $this->checkoutSession = $this->getMockBuilder(Session::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->configuration = $this->getMockBuilder(Configuration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->object = new Checkout($this->context, $this->checkoutSession);
+        $this->object = new Checkout($this->context, $this->checkoutSession, $this->configuration);
     }
 
     /**
@@ -45,16 +51,19 @@ class CheckoutTest extends TestCase
             ->getMock();
 
         $items = [];
-        foreach ($params['products'] as $product) {
+        $this->configuration->method('getOptions')->willReturnOnConsecutiveCalls($params['products'][0]['variants'], $params['products'][1]['variants']);
+        foreach ($params['products'] as $key => $product) {
             $items[] = $this->getItem(
                 $product['name'],
                 $product['sku'],
                 $product['price'],
-                $product['qty']
+                $product['qty'],
+                $product['variants'],
             );
         }
 
         $quote->method('getItems')->willReturn($items);
+
         $this->checkoutSession->method('getQuote')->willReturn($quote);
 
         $this->assertEquals($expected, $this->object->getCheckout());
@@ -77,12 +86,14 @@ class CheckoutTest extends TestCase
                                     'name' => 'Triblend Android T-Shirt',
                                     'id' => '12345',
                                     'price' => 15.25,
+                                    'variant' => 'color: black, size: M',
                                     'quantity' => 1,
                                 ],
                                 [
                                     'name' => 'Donut Friday Scented T-Shirt',
                                     'id' => '67890',
                                     'price' => '33.75',
+                                    'variant' => 'color: red, size: XXL',
                                     'quantity' => 1,
                                 ],
                             ],
@@ -97,12 +108,32 @@ class CheckoutTest extends TestCase
                             'sku' => '12345',
                             'price' => 15.25,
                             'qty' => 1,
+                            'variants' => [
+                                [
+                                    'label' => 'color',
+                                    'value' => 'black'
+                                ],
+                                [
+                                    'label' => 'size',
+                                    'value' => 'M'
+                                ]
+                            ]
                         ],
                         [
                             'name' => 'Donut Friday Scented T-Shirt',
                             'sku' => '67890',
                             'price' => 33.75,
                             'qty' => 1,
+                            'variants' => [
+                                [
+                                    'label' => 'color',
+                                    'value' => 'red'
+                                ],
+                                [
+                                    'label' => 'size',
+                                    'value' => 'XXL'
+                                ]
+                            ]
                         ],
                     ],
                 ],
@@ -116,7 +147,7 @@ class CheckoutTest extends TestCase
      * @param float $price
      * @return ItemQuote
      */
-    private function getItem(string $name, string $sku, float $price, int $qty): ItemQuote
+    private function getItem(string $name, string $sku, float $price, int $qty, array $variants): ItemQuote
     {
         $item = $this->getMockBuilder(ItemQuote::class)
             ->disableOriginalConstructor()

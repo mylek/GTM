@@ -9,10 +9,16 @@ use Magento\Sales\Model\Order\Item as ItemOrder;
 
 class Item
 {
+    private string $variant;
+
     public function __construct(
         private ItemOrder|ItemQuote $product
-    )
+    ) {
+    }
+
+    public function setVariant(string $variant): void
     {
+        $this->variant = $variant;
     }
 
     /**
@@ -24,13 +30,17 @@ class Item
         $data = [
             'name' => $this->product->getName(),
             'id' => $this->product->getSku(),
-            'price' => $this->product->getPrice()
+            'price' => $this->product->getPrice(),
         ];
 
         if ($this->product instanceof ItemOrder) {
             $data['quantity'] = $this->product->getQtyOrdered();
         } else {
             $data['quantity'] = $this->product->getQty();
+        }
+
+        if (!empty($this->variant)) {
+            $data['variant'] = $this->variant;
         }
 
         if ($i !== null) {

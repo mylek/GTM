@@ -36,7 +36,7 @@ class Success extends Template
      * @return Order
      */
     protected function getOrder(): Order {
-        $incrementId  = $this->checkoutSession->getLastRealOrder()->getIncrementId();
+        $incrementId = $this->checkoutSession->getLastRealOrder()->getIncrementId();
         return $this->order->loadByIncrementId($incrementId);
     }
 
