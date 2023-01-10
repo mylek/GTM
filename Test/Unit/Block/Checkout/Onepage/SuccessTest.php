@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MylSoft\GTM\Test\Unit\Block\Checkout\Onepage;
 
+use Magento\Catalog\Helper\Product\Configuration;
 use Magento\Quote\Model\Quote\Item;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -40,8 +41,17 @@ class SuccessTest extends TestCase
         $this->order = $this->getMockBuilder(Order::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->configuration = $this->getMockBuilder(Configuration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->object = new Success($this->context, $this->session, $this->onepageSuccess, $this->order);
+        $this->object = new Success(
+            $this->context,
+            $this->session,
+            $this->onepageSuccess,
+            $this->order,
+            $this->configuration
+        );
     }
 
     /**
@@ -58,7 +68,8 @@ class SuccessTest extends TestCase
                 $product['name'],
                 $product['sku'],
                 $product['price'],
-                $product['qty']
+                $product['qty'],
+                $product['variants'],
             );
         }
 
@@ -98,6 +109,7 @@ class SuccessTest extends TestCase
                                     'id' => '12345',
                                     'price' => 15.25,
                                     'quantity' => 1,
+                                    'variant' => 'color: black, size: M',
                                 ],
                                 [
                                     'name' => 'Donut Friday Scented T-Shirt',
@@ -116,8 +128,29 @@ class SuccessTest extends TestCase
                     'baseShippingAmount' => 5.99,
                     'couponCode' => 'SUMMER_SALE',
                     'products' => [
-                        ['name' => 'Triblend Android T-Shirt', 'sku' => '12345', 'price' => 15.25, 'qty' => 1],
-                        ['name' => 'Donut Friday Scented T-Shirt', 'sku' => '67890', 'price' => 33.75, 'qty' => 1],
+                        [
+                            'name' => 'Triblend Android T-Shirt',
+                            'sku' => '12345',
+                            'price' => 15.25,
+                            'qty' => 1,
+                            'variants' => [
+                                [
+                                    'label' => 'color',
+                                    'value' => 'black',
+                                ],
+                                [
+                                    'label' => 'size',
+                                    'value' => 'M',
+                                ],
+                            ],
+                        ],
+                        [
+                            'name' => 'Donut Friday Scented T-Shirt',
+                            'sku' => '67890',
+                            'price' => 33.75,
+                            'qty' => 1,
+                            'variants' => [],
+                        ],
                     ],
                 ],
             ],
@@ -128,9 +161,11 @@ class SuccessTest extends TestCase
      * @param string $name
      * @param string $sku
      * @param float $price
+     * @param int $qty
+     * @param array $variants
      * @return ItemOrder
      */
-    private function getItem(string $name, string $sku, float $price, int $qty): ItemOrder
+    private function getItem(string $name, string $sku, float $price, int $qty, array $variants): ItemOrder
     {
         $item = $this->getMockBuilder(ItemOrder::class)
             ->disableOriginalConstructor()
@@ -139,6 +174,7 @@ class SuccessTest extends TestCase
         $item->method('getSku')->willReturn($sku);
         $item->method('getPrice')->willReturn($price);
         $item->method('getQtyOrdered')->willReturn($qty);
+        $item->method('getProductOptions')->willReturn(['attributes_info' => $variants]);
 
         return $item;
     }

@@ -8,6 +8,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Element\Template;
 use MylSoft\GTM\Model\Service\OnepageSuccess;
 use Magento\Sales\Model\Order;
+use Magento\Catalog\Helper\Product\Configuration;
 
 class Success extends Template
 {
@@ -16,6 +17,7 @@ class Success extends Template
         private Session $checkoutSession,
         private OnepageSuccess $onepageSuccess,
         private Order $order,
+        private Configuration $configuration,
         array $data = []
     )
     {
@@ -26,6 +28,7 @@ class Success extends Template
     {
         $this->onepageSuccess = new OnepageSuccess();
         $order = $this->getOrder();
+        $this->onepageSuccess->setConfiguration($this->configuration);
         $this->onepageSuccess->setProducts($this->getProducts($order));
         $this->onepageSuccess->setOrder($order);
 

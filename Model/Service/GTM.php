@@ -6,19 +6,58 @@ namespace MylSoft\GTM\Model\Service;
 
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Category;
+use Magento\Quote\Model\Quote\Item as ItemQuote;
+use Magento\Sales\Model\Order\Item as ItemOrder;
 use MylSoft\GTM\Model\GTM\Product as ProductGTM;
+use Magento\Catalog\Helper\Product\Configuration;
 
 abstract class GTM
 {
     protected array $products;
     protected Category $category;
+    protected Configuration $configuration;
 
+    /**
+     * @param array $products
+     * @return void
+     */
     public function setProducts(array $products): void {
         $this->products = $products;
     }
 
+    /**
+     * @param Category $category
+     * @return void
+     */
     public function setCategory(Category $category): void {
         $this->category = $category;
+    }
+
+    /**
+     * @param Configuration $configuration
+     * @return void
+     */
+    public function setConfiguration(Configuration $configuration) {
+        $this->configuration = $configuration;
+    }
+
+    /**
+     * @param ItemOrder|ItemQuote $product
+     * @return string
+     */
+    protected function getVariant(ItemOrder|ItemQuote $product): string {
+        $productOptions = $this->configuration->getOptions($product);
+        if (!$productOptions) {
+            return '';
+        }
+
+        $variant = '';
+        foreach ($productOptions as $option) {
+            $variant .= $option['label'] . ': ' . $option['value'] . ', ';
+        }
+
+
+        return rtrim($variant, ', ');
     }
 
     /**

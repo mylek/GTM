@@ -29,6 +29,7 @@ class ItemTest extends TestCase
     {
         $this->setProduct($params['product']);
         $this->object = new Item($this->product);
+        $this->object->setVariant($params['product']['variants']);
         $this->assertEquals($excepted, $this->object->getProduct());
     }
 
@@ -56,9 +57,16 @@ class ItemTest extends TestCase
                     'id' => 'sku1',
                     'price' => 11.11,
                     'quantity' => 3,
+                    'variant' => 'color: black, size: M',
                 ],
                 [
-                    'product' => ['name' => "Product 1", "sku" => 'sku1', 'price' => 11.11, 'qty' => 3],
+                    'product' => [
+                        'name' => "Product 1",
+                        "sku" => 'sku1',
+                        'price' => 11.11,
+                        'qty' => 3,
+                        'variants' => 'color: black, size: M',
+                    ],
                 ],
             ],
         ];
