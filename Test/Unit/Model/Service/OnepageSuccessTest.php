@@ -10,12 +10,17 @@ use PHPUnit\Framework\MockObject\MockObject;
 use MylSoft\GTM\Model\Service\OnepageSuccess;
 use Magento\Checkout\Model\Session;
 use Magento\Sales\Model\Order;
+use MylSoft\GTM\Helper\Config;
 
 class OnepageSuccessTest extends TestCase
 {
     private OnepageSuccess $object;
+
     private MockObject $checkoutSession;
+
     private MockObject $orderItemsDetails;
+
+    private MockObject $config;
 
     protected function setUp(): void
     {
@@ -23,6 +28,9 @@ class OnepageSuccessTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->orderItemsDetails = $this->getMockBuilder(Order::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->config = $this->getMockBuilder(Config::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->object = new OnepageSuccess($this->checkoutSession, $this->orderItemsDetails);
@@ -34,7 +42,8 @@ class OnepageSuccessTest extends TestCase
      * @return void
      * @dataProvider getDataProvider
      */
-    public function testGetData(array $expected, array $params): void {
+    public function testGetData(array $expected, array $params): void
+    {
         $order = $this->getMockBuilder(Order::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -54,6 +63,7 @@ class OnepageSuccessTest extends TestCase
 
         $this->object->setProducts($products);
         $this->object->setOrder($order);
+        $this->object->setAffiliation($params['affiliation']);
         $this->assertEquals($expected, $this->object->getData());
     }
 
@@ -77,7 +87,7 @@ class OnepageSuccessTest extends TestCase
                                     'name' => 'Triblend Android T-Shirt',
                                     'id' => '12345',
                                     'price' => 35.43,
-                                    'quantity' => 1
+                                    'quantity' => 1,
                                 ],
                             ],
                         ],
@@ -85,13 +95,14 @@ class OnepageSuccessTest extends TestCase
                 ],
                 [
                     'incrementId' => '00001',
+                    'affiliation' => 'Online Store',
                     'baseSubtotal' => 35.43,
                     'taxAmount' => 4.9,
                     'baseShippingAmount' => 5.99,
                     'couponCode' => 'SUMMER_SALE',
                     'products' => [
-                        ['name' => 'Triblend Android T-Shirt', 'sku' => '12345', 'price' => 35.43, 'qty' => 1]
-                    ]
+                        ['name' => 'Triblend Android T-Shirt', 'sku' => '12345', 'price' => 35.43, 'qty' => 1],
+                    ],
                 ],
             ],
         ];
