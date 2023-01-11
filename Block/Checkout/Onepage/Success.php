@@ -9,6 +9,7 @@ use Magento\Framework\View\Element\Template;
 use MylSoft\GTM\Model\Service\OnepageSuccess;
 use Magento\Sales\Model\Order;
 use Magento\Catalog\Helper\Product\Configuration;
+use MylSoft\GTM\Helper\Config;
 
 class Success extends Template
 {
@@ -18,9 +19,9 @@ class Success extends Template
         private OnepageSuccess $onepageSuccess,
         private Order $order,
         private Configuration $configuration,
+        private Config $config,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
     }
 
@@ -29,6 +30,7 @@ class Success extends Template
         $this->onepageSuccess = new OnepageSuccess();
         $order = $this->getOrder();
         $this->onepageSuccess->setConfiguration($this->configuration);
+        $this->onepageSuccess->setAffiliation($this->config->getAffiliation());
         $this->onepageSuccess->setProducts($this->getProducts($order));
         $this->onepageSuccess->setOrder($order);
 
@@ -38,8 +40,10 @@ class Success extends Template
     /**
      * @return Order
      */
-    protected function getOrder(): Order {
+    protected function getOrder(): Order
+    {
         $incrementId = $this->checkoutSession->getLastRealOrder()->getIncrementId();
+
         return $this->order->loadByIncrementId($incrementId);
     }
 
@@ -49,7 +53,8 @@ class Success extends Template
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    protected function getProducts(Order $order): array {
+    protected function getProducts(Order $order): array
+    {
         return $order->getAllVisibleItems();
     }
 }

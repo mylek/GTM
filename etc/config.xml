@@ -5,6 +5,7 @@
             <main>
                 <code></code>
                 <enabled>0</enabled>
+                <affiliation></affiliation>
             </main>
         </gtm>
     </default>

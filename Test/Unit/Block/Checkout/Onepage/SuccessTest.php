@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MylSoft\GTM\Test\Unit\Block\Checkout\Onepage;
 
 use Magento\Catalog\Helper\Product\Configuration;
-use Magento\Quote\Model\Quote\Item;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use MylSoft\GTM\Block\Checkout\Onepage\Success;
@@ -14,6 +13,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Sales\Model\Order\Item as ItemOrder;
 use MylSoft\GTM\Model\Service\OnepageSuccess;
 use Magento\Sales\Model\Order;
+use MylSoft\GTM\Helper\Config;
 
 class SuccessTest extends TestCase
 {
@@ -26,6 +26,8 @@ class SuccessTest extends TestCase
     private MockObject $onepageSuccess;
 
     private MockObject $order;
+
+    private MockObject $config;
 
     protected function setUp(): void
     {
@@ -44,13 +46,17 @@ class SuccessTest extends TestCase
         $this->configuration = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->config = $this->getMockBuilder(Config::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->object = new Success(
             $this->context,
             $this->session,
             $this->onepageSuccess,
             $this->order,
-            $this->configuration
+            $this->configuration,
+            $this->config
         );
     }
 
@@ -84,6 +90,7 @@ class SuccessTest extends TestCase
         $order->method('getAllVisibleItems')->willReturn($items);
         $this->order->method('loadByIncrementId')->willReturn($order);
         $this->session->method('getLastRealOrder')->willReturn($order);
+        $this->config->method('getAffiliation')->willReturn($params['affiliation']);
 
         $this->assertEquals($expected, $this->object->getSuccess());
     }
@@ -123,6 +130,7 @@ class SuccessTest extends TestCase
                 ],
                 [
                     'orderId' => 'T12345',
+                    'affiliation' => 'Online Store',
                     'baseSubtotal' => 35.43,
                     'taxAmount' => 4.9,
                     'baseShippingAmount' => 5.99,

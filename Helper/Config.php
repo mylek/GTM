@@ -12,6 +12,7 @@ class Config
     public const CONFIG_PATH = 'gtm/';
     public const CONFIG_ENABLE = 'main/enabled';
     public const CONFIG_CODE = 'main/code';
+    public const CONFIG_AFFILIATION = 'main/affiliation';
 
     public function __construct(
         private ScopeConfigInterface $scope
@@ -36,6 +37,17 @@ class Config
     {
         return (string)$this->scope->getValue(
             self::CONFIG_PATH . self::CONFIG_CODE,
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getAffiliation(): string
+    {
+        return (string)$this->scope->getValue(
+            self::CONFIG_PATH . self::CONFIG_AFFILIATION,
             ScopeInterface::SCOPE_STORE
         );
     }

@@ -13,6 +13,8 @@ class OnepageSuccess extends GTM
 {
     protected Order $order;
 
+    protected string $affiliation;
+
     /**
      * @return array
      */
@@ -22,7 +24,7 @@ class OnepageSuccess extends GTM
             'ecommerce' => [
                 'purchase' => [
                     'actionField' => $this->getActionField(),
-                    'products' => $this->getProducts()
+                    'products' => $this->getProducts(),
                 ],
             ],
         ];
@@ -48,7 +50,8 @@ class OnepageSuccess extends GTM
      * @param ItemOrder|ItemQuote $product
      * @return string
      */
-    protected function getVariant(ItemOrder|ItemQuote $product): string {
+    protected function getVariant(ItemOrder|ItemQuote $product): string
+    {
         $options = $product->getProductOptions();
         if (!$options) {
             return '';
@@ -59,19 +62,28 @@ class OnepageSuccess extends GTM
             $variant .= $option['label'] . ': ' . $option['value'] . ', ';
         }
 
-
         return rtrim($variant, ', ');
     }
 
-    public function setOrder(Order $order): void {
+    public function setOrder(Order $order): void
+    {
         $this->order = $order;
+    }
+
+    /**
+     * @param string $affiliation
+     * @return void
+     */
+    public function setAffiliation(string $affiliation): void
+    {
+        $this->affiliation = $affiliation;
     }
 
     private function getActionField(): array
     {
         return [
             'id' => $this->order->getIncrementId(),
-            'affiliation' => 'Online Store',
+            'affiliation' => $this->affiliation,
             'revenue' => $this->order->getBaseSubtotal(),
             'tax' => $this->order->getTaxAmount(),
             'shipping' => $this->order->getBaseShippingAmount(),

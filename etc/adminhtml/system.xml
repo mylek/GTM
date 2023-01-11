@@ -21,6 +21,9 @@
                 <field id="code" translate="label" type="text" showInDefault="1" canRestore="1">
                     <label>GTM Code</label>
                 </field>
+                <field id="affiliation" translate="label" type="text" showInDefault="1" canRestore="1">
+                    <label>Affiliation</label>
+                </field>
             </group>
         </section>
     </system>

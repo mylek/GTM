@@ -68,12 +68,35 @@ class ConfigTest extends TestCase
     }
 
     /**
+     * @param string $expected
+     * @param string $return
+     * @return void
+     * @dataProvider getAffiliationProvider
+     */
+    public function testGetAffiliation(string $expected, string $return): void {
+        $this->scope
+            ->method('getValue')
+            ->willReturn($return);
+        $this->assertEquals($expected, $this->object->getAffiliation());
+    }
+
+    /**
      * @return \string[][]
      */
     private function getCodeProvider(): array {
         return [
             ['GTM-111111', 'GTM-111111'],
             ['GTM-999999', 'GTM-999999']
+        ];
+    }
+
+    /**
+     * @return \string[][]
+     */
+    private function getAffiliationProvider(): array {
+        return [
+            ['Store Test', 'Store Test'],
+            ['', '']
         ];
     }
 }
