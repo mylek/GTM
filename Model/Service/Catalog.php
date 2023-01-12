@@ -11,7 +11,7 @@ use MylSoft\GTM\Model\GTM\Product;
 class Catalog extends GTM
 {
     public function __construct(
-        protected Category $category,
+        protected ?Category $category,
         protected Currency $currency
     ) {
     }

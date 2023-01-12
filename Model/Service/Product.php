@@ -16,7 +16,7 @@ class Product extends GTM
             'ecommerce' => [
                 'detail' => [
                     'actionField' => [
-                        'list' => $this->category->getName()
+                        'list' => $this->category !== null ? $this->category->getName() : ''
                     ],
                     'products' => $this->getProducts(false)
                 ]

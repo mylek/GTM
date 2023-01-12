@@ -14,7 +14,7 @@ use Magento\Catalog\Helper\Product\Configuration;
 abstract class GTM
 {
     protected array $products;
-    protected Category $category;
+    protected ?Category $category;
     protected Configuration $configuration;
 
     /**
@@ -26,10 +26,10 @@ abstract class GTM
     }
 
     /**
-     * @param Category $category
+     * @param Category|null $category
      * @return void
      */
-    public function setCategory(Category $category): void {
+    public function setCategory(?Category $category): void {
         $this->category = $category;
     }
 
@@ -69,7 +69,8 @@ abstract class GTM
 
         $i = 1;
         foreach ($this->products as $product) {
-            $productGTM = new ProductGTM($product, $this->category->getName());
+            $categoryName = $this->category !== null ? $this->category->getName() : '';
+            $productGTM = new ProductGTM($product, $categoryName);
             $products[] = $productGTM->getProduct($position ? $i++ : null);
         }
 
