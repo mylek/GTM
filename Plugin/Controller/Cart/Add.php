@@ -41,7 +41,6 @@ class Add
         $context = $this->setBodyJson($result->getBody(), $product);
 
         $result->setBody($context);
-
         return $result;
     }
 
