@@ -19,8 +19,7 @@ class Add
     public function __construct(
         private Cart $cart,
         private Configuration $configuration
-    )
-    {
+    ) {
     }
 
     /**
@@ -28,7 +27,10 @@ class Add
      * @param ResponseInterface|ResultInterface $result
      * @return ResponseInterface|ResultInterface
      */
-    public function afterExecute(AddOrg $subject, ResponseInterface|ResultInterface $result): ResponseInterface|ResultInterface {
+    public function afterExecute(
+        AddOrg $subject,
+        ResponseInterface|ResultInterface $result
+    ): ResponseInterface|ResultInterface {
         $quote = $this->cart->getQuote();
         if (!$quote) {
             throw new \Exception('Quote is not set');
@@ -39,6 +41,7 @@ class Add
         $context = $this->setBodyJson($result->getBody(), $product);
 
         $result->setBody($context);
+
         return $result;
     }
 
@@ -46,11 +49,13 @@ class Add
      * @param Item $item
      * @return array
      */
-    public function prepareProductData(Item $item): array {
+    public function prepareProductData(Item $item): array
+    {
         $product = new ItemGTM($item);
         $productOptions = $this->configuration->getOptions($item);
         $variants = $product->getVariantByArray($productOptions);
         $product->setVariant($variants);
+
         return $product->getProduct();
     }
 
@@ -59,7 +64,8 @@ class Add
      * @param array $product
      * @return string
      */
-    public function setBodyJson(string $body, array $product): string {
+    public function setBodyJson(string $body, array $product): string
+    {
         if (!isset($product) || empty($product)) {
             return $body;
         }

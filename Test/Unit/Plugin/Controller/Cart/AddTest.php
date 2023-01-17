@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace MylSoft\GTM\Test\Unit\Plugin\Controller\Cart;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use MylSoft\GTM\Plugin\Controller\Cart\Add;
 use Magento\Checkout\Model\Cart;
-use Magento\Sales\Model\Order\Item as ItemOrder;
+use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item as ItemQuote;
 use Magento\Catalog\Helper\Product\Configuration;
+use Magento\Checkout\Controller\Cart\Add as AddOrg;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\App\Response\Http;
 
 class AddTest extends TestCase
 {
@@ -20,12 +24,35 @@ class AddTest extends TestCase
 
     private MockObject $configuration;
 
+    private MockObject $addOrg;
+
+    private MockObject $result;
+
+    private MockObject $quote;
+
+    private MockObject $item;
+
     protected function setUp(): void
     {
         $this->cart = $this->getMockBuilder(Cart::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->configuration = $this->getMockBuilder(Configuration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->addOrg = $this->getMockBuilder(AddOrg::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->result = $this->getMockBuilder(Http::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->quote = $this->getMockBuilder(Quote::class)
+            ->disableOriginalConstructor()
+            ->addMethods(['getLastAddedItem'])
+            ->getMock();
+        $this->item = $this->getMockBuilder(ItemQuote::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -40,15 +67,14 @@ class AddTest extends TestCase
      */
     public function testPrepareProductData(array $expected, array $params): void
     {
-        $item = $this->getMockBuilder(ItemQuote::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $item->method('getName')->willReturn($params['product']['name']);
-        $item->method('getSku')->willReturn($params['product']['sku']);
-        $item->method('getPrice')->willReturn($params['product']['price']);
-        $item->method('getQty')->willReturn($params['product']['qty']);
+        $this->cart->method('getQuote')->willReturn($this->quote);
+        $this->item->method('getName')->willReturn($params['product']['name']);
+        $this->item->method('getSku')->willReturn($params['product']['sku']);
+        $this->item->method('getPrice')->willReturn($params['product']['price']);
+        $this->item->method('getQty')->willReturn($params['product']['qty']);
         $this->configuration->method('getOptions')->willReturn($params['attributesInfo']);
-        $this->assertEquals($expected, $this->object->prepareProductData($item));
+
+        $this->assertEquals($expected, $this->object->prepareProductData($this->item));
     }
 
     /**
@@ -63,6 +89,38 @@ class AddTest extends TestCase
             json_encode($expected),
             $this->object->setBodyJson($params['body'], $params['product'])
         );
+    }
+
+    /**
+     * @param array $params
+     * @return void
+     * @throws Exception
+     * @dataProvider afterExecuteProvider
+     */
+    public function testAfterExecute(array $params): void
+    {
+        $this->configuration->method('getOptions')->willReturn($params['variants']);
+        $this->quote->method('getLastAddedItem')->willReturn($this->item);
+        $this->cart->method('getQuote')->willReturn($this->quote);
+
+        $this->result->method('getBody')->willReturn($params['body']);
+
+        $result = $this->object->afterExecute($this->addOrg, $this->result);
+        $body = json_decode($result->getBody());
+
+        $this->assertArrayHasKey('gtm_product', $body);
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    public function testAfterExecuteException(): void
+    {
+        $quote = null;
+        $this->expectException(Exception::class);
+        $this->cart->method('getQuote')->willReturn($quote);
+        $this->object->afterExecute($this->addOrg, $this->result);
     }
 
     /**
@@ -160,6 +218,30 @@ class AddTest extends TestCase
                         'category' => 'Category 1',
                         'variant' => 'color: black, size: XL',
                         'quantity' => 3,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return \string[][][][]
+     */
+    private function afterExecuteProvider(): array
+    {
+        return [
+            [
+                [
+                    'body' => '{}',
+                    'variants' => [
+                        [
+                            'label' => 'color',
+                            'value' => 'red',
+                        ],
+                        [
+                            'label' => 'size',
+                            'value' => 'XS',
+                        ],
                     ],
                 ],
             ],
