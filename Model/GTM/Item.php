@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MylSoft\GTM\Model\GTM;
 
+use Exception;
 use Magento\Quote\Model\Quote\Item as ItemQuote;
 use Magento\Sales\Model\Order\Item as ItemOrder;
 
@@ -16,9 +17,36 @@ class Item
     ) {
     }
 
+    /**
+     * @param string $variant
+     * @return void
+     */
     public function setVariant(string $variant): void
     {
         $this->variant = $variant;
+    }
+
+    public function getVariantByArray(array $variants): string {
+        $variant = '';
+        foreach ($variants as $option) {
+            $variant .= $option['label'] . ': ' . $option['value'] . ', ';
+        }
+
+        return rtrim($variant, ', ');
+    }
+
+    public function getVariant(): string
+    {
+        if (!($this->product instanceof ItemOrder)) {
+            throw new Exception('You must set ItemOrder');
+        }
+
+        $options = $this->product->getProductOptions();
+        if (!$options) {
+            return '';
+        }
+
+        return $this->getVariantByArray($options['attributes_info']);
     }
 
     /**
