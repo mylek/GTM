@@ -40,30 +40,9 @@ define([
                     /** @inheritdoc */
                     success: function (res) {
                         var eventData, parameters;
-
-                        var variants = [];
-                        $('div.swatch-attribute .swatch-option').each(function (k,v) {
-                            var valSelector = $(v).attr('aria-checked');
-                            if (valSelector === "false") {
-                                return;
-                            }
-                            var val = $(v).attr('aria-label');
-                            var idOptions = $(v).attr('aria-describedby');
-                            var name = $('#' + idOptions).text();
-
-                            if (val !== null && name !== null) {
-                                variants.push(name + ': ' + val);
-                            }
-                        });
-
-                        $('.product-options-wrapper .field').each(function (k,v) {
-                            var name = $(v).find('.label span').text();
-                            var val = $(v).find('.select2-selection__rendered').text();
-
-                            if (val !== null && name !== null) {
-                                variants.push(name + ': ' + val);
-                            }
-                        });
+                        var gtmProduct = res.gtm_product;
+                        var currency = $('meta[property="product:price:currency"]')
+                            .attr('content');
 
                         $(document).trigger('ajax:addToCart', {
                             'sku': form.data().productSku,
@@ -72,27 +51,28 @@ define([
                             'response': res
                         });
 
-                        var price = $('.product-info-price span meta[itemprop="price"]').attr("content");
-                        var name = $('h1.page-title span').text();
-                        var categoryName = $('.breadcrumbs .items .item.product strong').text();
-                        var qty = $('#qty').val();
-                        var currency = $('meta[property="product:price:currency"]').attr("content");
 
-                        dataLayer.push({ ecommerce: null });
+                        $.ajax({
+                            url: '/gtm/cart/add/',
+                            type: 'post',
+                            dataType: 'json',
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+
+                            /** @inheritdoc */
+                            success: function (res) {
+                                console.log(res);
+                            }
+                        });
+
+                        dataLayer.push({ecommerce: null});
                         dataLayer.push({
                             'event': 'addToCart',
                             'ecommerce': {
                                 'currencyCode': currency,
                                 'add': {
-                                    'products': [{
-                                        'name': name,
-                                        'id': productIds[0],
-                                        'price': price,
-                                        'brand': '',
-                                        'category': categoryName,
-                                        'variant': variants.join(', '),
-                                        'quantity': qty
-                                    }]
+                                    'products': [gtmProduct]
                                 }
                             }
                         });
@@ -107,7 +87,8 @@ define([
                                 'redirectParameters': []
                             };
                             // trigger global event, so other modules will be able add parameters to redirect url
-                            $('body').trigger('catalogCategoryAddToCartRedirect', eventData);
+                            $('body')
+                                .trigger('catalogCategoryAddToCartRedirect', eventData);
 
                             if (eventData.redirectParameters.length > 0) {
                                 parameters = res.backUrl.split('#');
@@ -125,8 +106,10 @@ define([
                         }
 
                         if (res.minicart) {
-                            $(self.options.minicartSelector).replaceWith(res.minicart);
-                            $(self.options.minicartSelector).trigger('contentUpdated');
+                            $(self.options.minicartSelector)
+                                .replaceWith(res.minicart);
+                            $(self.options.minicartSelector)
+                                .trigger('contentUpdated');
                         }
 
                         if (res.product && res.product.statusText) {
@@ -156,7 +139,7 @@ define([
                         }
                     }
                 });
-            },
+            }
         });
     }
 });
